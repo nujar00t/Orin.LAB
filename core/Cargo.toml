@@ -1,0 +1,15 @@
+[package]
+name = "orinlab-core"
+version = "1.0.0"
+edition = "2021"
+description = "Orin.LAB high-performance data processing core"
+license = "MIT"
+repository = "https://github.com/nujar00t/orinlab"
+
+[lib]
+name = "orinlab_core"
+path = "src/lib.rs"
+
+[dependencies]
+
+[dev-dependencies]
