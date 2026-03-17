@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Orin.LAB — AI Research Lab for Crypto Markets</title>
+  <meta name="description" content="Open-source AI research lab for crypto markets. Solana signals, on-chain data, and automated alpha — powered by Claude AI." />
+  <meta property="og:title" content="Orin.LAB" />
+  <meta property="og:description" content="AI Research Lab for Crypto Markets. Reads the market. Signals the moves. Posts the alpha." />
+  <meta property="og:type" content="website" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #21262d;
+      --cyan: #00e5ff;
+      --purple: #9945ff;
+      --green: #22c55e;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+      --text: #e6edf3;
+      --muted: #8b949e;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 2rem;
+      background: rgba(13,17,23,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { font-weight: 700; font-size: 1.1rem; letter-spacing: -0.5px; }
+    .nav-logo span { color: var(--cyan); }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      background: var(--cyan); color: #000; padding: 0.45rem 1.1rem;
+      border-radius: 6px; font-weight: 600; font-size: 0.85rem;
+      text-decoration: none; transition: opacity 0.2s;
+    }
+    .nav-cta:hover { opacity: 0.85; }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 6rem 2rem 4rem;
+      background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(0,229,255,0.08), transparent);
+    }
+    .badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: rgba(0,229,255,0.08); border: 1px solid rgba(0,229,255,0.2);
+      color: var(--cyan); padding: 0.3rem 0.9rem; border-radius: 999px;
+      font-size: 0.8rem; font-weight: 500; margin-bottom: 1.5rem;
+    }
+    .badge-dot { width: 6px; height: 6px; background: var(--cyan); border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    h1 {
+      font-size: clamp(2.5rem, 7vw, 5rem);
+      font-weight: 700; letter-spacing: -2px; line-height: 1.1;
+      margin-bottom: 1.5rem;
+    }
+    h1 .accent { color: var(--cyan); }
+    h1 .dot { color: var(--muted); }
+
+    .tagline {
+      font-size: clamp(1rem, 2.5vw, 1.25rem);
+      color: var(--muted); max-width: 520px; margin-bottom: 2.5rem;
+    }
+
+    .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+    .btn-primary {
+      background: var(--cyan); color: #000; padding: 0.75rem 1.75rem;
+      border-radius: 8px; font-weight: 600; text-decoration: none;
+      transition: opacity 0.2s; font-size: 0.95rem;
+    }
+    .btn-primary:hover { opacity: 0.85; }
+    .btn-secondary {
+      background: var(--surface); color: var(--text); padding: 0.75rem 1.75rem;
+      border-radius: 8px; font-weight: 500; text-decoration: none;
+      border: 1px solid var(--border); transition: border-color 0.2s; font-size: 0.95rem;
+    }
+    .btn-secondary:hover { border-color: var(--muted); }
+
+    .hero-stats {
+      display: flex; gap: 3rem; margin-top: 4rem;
+      flex-wrap: wrap; justify-content: center;
+    }
+    .stat { text-align: center; }
+    .stat-value { font-size: 1.75rem; font-weight: 700; color: var(--cyan); }
+    .stat-label { font-size: 0.8rem; color: var(--muted); margin-top: 0.2rem; }
+
+    /* SECTIONS */
+    section { padding: 5rem 2rem; max-width: 1100px; margin: 0 auto; }
+    .section-label { color: var(--cyan); font-size: 0.8rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 0.75rem; }
+    h2 { font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 700; letter-spacing: -1px; margin-bottom: 1rem; }
+    .section-desc { color: var(--muted); max-width: 540px; margin-bottom: 3rem; }
+
+    /* FEATURES */
+    .features-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;
+    }
+    .feature-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.75rem;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .feature-card:hover { border-color: rgba(0,229,255,0.3); transform: translateY(-2px); }
+    .feature-icon { font-size: 1.75rem; margin-bottom: 1rem; }
+    .feature-title { font-weight: 600; font-size: 1rem; margin-bottom: 0.5rem; }
+    .feature-desc { color: var(--muted); font-size: 0.875rem; line-height: 1.6; }
+    .feature-tag {
+      display: inline-block; margin-top: 0.75rem;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+      background: rgba(0,229,255,0.08); color: var(--cyan);
+      padding: 0.2rem 0.5rem; border-radius: 4px;
+    }
+
+    /* STACK */
+    .stack-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;
+    }
+    .stack-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1.25rem 1.5rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .stack-lang {
+      width: 36px; height: 36px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.75rem; font-family: 'JetBrains Mono', monospace;
+      flex-shrink: 0;
+    }
+    .lang-py { background: rgba(55,118,171,0.2); color: #3776ab; }
+    .lang-ts { background: rgba(49,120,198,0.2); color: #3178c6; }
+    .lang-go { background: rgba(0,173,216,0.2); color: #00add8; }
+    .lang-rs { background: rgba(206,66,43,0.2); color: #ce422b; }
+    .stack-info {}
+    .stack-name { font-weight: 600; font-size: 0.9rem; }
+    .stack-desc { color: var(--muted); font-size: 0.78rem; margin-top: 0.1rem; }
+
+    /* SIGNAL DEMO */
+    .signal-demo {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.5rem;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.875rem;
+      max-width: 480px;
+    }
+    .signal-header { color: var(--muted); font-size: 0.75rem; margin-bottom: 1rem; }
+    .signal-line { display: flex; gap: 0.75rem; margin-bottom: 0.5rem; }
+    .signal-key { color: var(--muted); min-width: 100px; }
+    .signal-buy { color: var(--green); font-weight: 600; }
+    .signal-conf { color: var(--cyan); }
+    .signal-risk { color: var(--yellow); }
+
+    /* QUICKSTART */
+    .code-block {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1.25rem 1.5rem;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;
+      line-height: 1.8; overflow-x: auto; margin-bottom: 1rem;
+    }
+    .code-comment { color: var(--muted); }
+    .code-cmd { color: var(--cyan); }
+    .step { margin-bottom: 2rem; }
+    .step-num {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 28px; height: 28px; background: rgba(0,229,255,0.1);
+      border: 1px solid rgba(0,229,255,0.3); border-radius: 50%;
+      color: var(--cyan); font-weight: 700; font-size: 0.8rem;
+      margin-bottom: 0.75rem;
+    }
+    .step-title { font-weight: 600; margin-bottom: 0.5rem; }
+
+    /* ROADMAP */
+    .roadmap-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; }
+    .roadmap-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.5rem;
+    }
+    .roadmap-version { font-family: 'JetBrains Mono', monospace; color: var(--cyan); font-size: 0.85rem; margin-bottom: 0.25rem; }
+    .roadmap-title { font-weight: 600; margin-bottom: 1rem; }
+    .roadmap-item { display: flex; align-items: flex-start; gap: 0.6rem; margin-bottom: 0.5rem; font-size: 0.875rem; }
+    .check { color: var(--green); }
+    .todo { color: var(--muted); }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border); padding: 2.5rem 2rem;
+      text-align: center; color: var(--muted); font-size: 0.85rem;
+    }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+    .footer-links { display: flex; gap: 1.5rem; justify-content: center; margin-bottom: 1rem; flex-wrap: wrap; }
+
+    @media (max-width: 640px) {
+      nav { padding: 1rem; }
+      .nav-links { display: none; }
+      .hero-stats { gap: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Orin<span>.</span>LAB</div>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#stack">Stack</a></li>
+    <li><a href="#quickstart">Quickstart</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
+  </ul>
+  <a class="nav-cta" href="https://github.com/nujar00t/Orin.LAB" target="_blank">GitHub</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="badge">
+    <span class="badge-dot"></span>
+    Built on Solana · Powered by Claude AI
+  </div>
+  <h1>
+    AI Research Lab<br/>
+    for <span class="accent">Crypto Markets</span>
+  </h1>
+  <p class="tagline">
+    Reads the market. Signals the moves. Posts the alpha.<br/>
+    Open-source, multi-language, and built for serious traders.
+  </p>
+  <div class="hero-actions">
+    <a class="btn-primary" href="https://github.com/nujar00t/Orin.LAB" target="_blank">View on GitHub</a>
+    <a class="btn-secondary" href="#quickstart">Get Started →</a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-value">6</div><div class="stat-label">AI Agents</div></div>
+    <div class="stat"><div class="stat-value">4</div><div class="stat-label">Languages</div></div>
+    <div class="stat"><div class="stat-value">∞</div><div class="stat-label">Alpha</div></div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-label">Capabilities</div>
+  <h2>Everything you need to research crypto markets</h2>
+  <p class="section-desc">A modular toolkit — use what you need, extend what you want.</p>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">🤖</div>
+      <div class="feature-title">Telegram AI Bot</div>
+      <div class="feature-desc">Ask market questions, get AI signals, analyze charts by sending a photo. Maintains conversation history per user.</div>
+      <span class="feature-tag">Python</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📊</div>
+      <div class="feature-title">Signal Engine</div>
+      <div class="feature-desc">Generates BUY/SELL/HOLD signals with confidence scores, price targets, stop-loss levels, and risk assessment.</div>
+      <span class="feature-tag">Python · Jupiter API</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🐋</div>
+      <div class="feature-title">Whale Tracker</div>
+      <div class="feature-desc">Monitors large Solana wallets for significant movements. Fires instant alerts when whales move above your threshold.</div>
+      <span class="feature-tag">Python · Solana RPC</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📈</div>
+      <div class="feature-title">Chart Analysis</div>
+      <div class="feature-desc">Send any chart screenshot to the Telegram bot. Claude vision analyzes patterns, levels, and generates a signal.</div>
+      <span class="feature-tag">Claude Vision</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🐦</div>
+      <div class="feature-title">Auto Poster</div>
+      <div class="feature-desc">Automatically posts high-confidence signals to Twitter/X. Configurable threshold, formatting, and schedule.</div>
+      <span class="feature-tag">TypeScript</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">⚡</div>
+      <div class="feature-title">High-Performance Core</div>
+      <div class="feature-desc">Rust SDK handles heavy computation — data normalization, indicator math, batch processing — at native speed.</div>
+      <span class="feature-tag">Rust</span>
+    </div>
+  </div>
+</section>
+
+<!-- SIGNAL DEMO -->
+<section style="padding-top: 0">
+  <div class="section-label">Live Output</div>
+  <h2>What a signal looks like</h2>
+  <p class="section-desc">Every signal includes confidence, targets, and risk — not just a direction.</p>
+  <div class="signal-demo">
+    <div class="signal-header">$ /signal $SOL</div>
+    <div class="signal-line"><span class="signal-key">SIGNAL:</span> <span class="signal-buy">BUY</span></div>
+    <div class="signal-line"><span class="signal-key">Confidence:</span> <span class="signal-conf">82/100</span></div>
+    <div class="signal-line"><span class="signal-key">Target:</span> <span>$185.00</span></div>
+    <div class="signal-line"><span class="signal-key">Stop Loss:</span> <span>$152.00</span></div>
+    <div class="signal-line"><span class="signal-key">Reasoning:</span> <span style="color:#8b949e">SOL holding key support at $158 with increasing DEX volume and ecosystem activity.</span></div>
+    <div class="signal-line"><span class="signal-key">Risk Level:</span> <span class="signal-risk">MEDIUM</span></div>
+  </div>
+</section>
+
+<!-- STACK -->
+<section id="stack">
+  <div class="section-label">Tech Stack</div>
+  <h2>Multi-language by design</h2>
+  <p class="section-desc">Each component uses the best language for its job.</p>
+  <div class="stack-grid">
+    <div class="stack-card">
+      <div class="stack-lang lang-py">PY</div>
+      <div class="stack-info">
+        <div class="stack-name">Python</div>
+        <div class="stack-desc">Bot, agents, signal engine</div>
+      </div>
+    </div>
+    <div class="stack-card">
+      <div class="stack-lang lang-ts">TS</div>
+      <div class="stack-info">
+        <div class="stack-name">TypeScript</div>
+        <div class="stack-desc">Auto poster, Solana SDK</div>
+      </div>
+    </div>
+    <div class="stack-card">
+      <div class="stack-lang lang-go">Go</div>
+      <div class="stack-info">
+        <div class="stack-name">Go</div>
+        <div class="stack-desc">Lightweight signal CLI</div>
+      </div>
+    </div>
+    <div class="stack-card">
+      <div class="stack-lang lang-rs">RS</div>
+      <div class="stack-info">
+        <div class="stack-name">Rust</div>
+        <div class="stack-desc">High-performance core SDK</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUICKSTART -->
+<section id="quickstart">
+  <div class="section-label">Setup</div>
+  <h2>Up and running in minutes</h2>
+  <p class="section-desc">Only 2 API keys required to start.</p>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-title">Clone & install</div>
+    <div class="code-block">
+      <span class="code-comment"># Clone the repo</span><br/>
+      <span class="code-cmd">git clone https://github.com/nujar00t/Orin.LAB.git</span><br/>
+      <span class="code-cmd">cd Orin.LAB && make install</span>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-title">Configure environment</div>
+    <div class="code-block">
+      <span class="code-cmd">cp .env.example .env</span><br/>
+      <span class="code-comment"># Add your keys:</span><br/>
+      TELEGRAM_BOT_TOKEN=your_token<br/>
+      ANTHROPIC_API_KEY=your_key
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-title">Run</div>
+    <div class="code-block">
+      <span class="code-cmd">python orin.py</span><br/>
+      <span class="code-comment"># Or directly: make bot / make signal</span>
+    </div>
+  </div>
+</section>
+
+<!-- ROADMAP -->
+<section id="roadmap">
+  <div class="section-label">Roadmap</div>
+  <h2>What's next</h2>
+  <p class="section-desc">Orin.LAB is actively developed. Community contributions welcome.</p>
+  <div class="roadmap-grid">
+    <div class="roadmap-card">
+      <div class="roadmap-version">v1.0.0</div>
+      <div class="roadmap-title">Foundation ✅</div>
+      <div class="roadmap-item"><span class="check">✓</span> Telegram AI Bot</div>
+      <div class="roadmap-item"><span class="check">✓</span> Signal Engine</div>
+      <div class="roadmap-item"><span class="check">✓</span> Auto Poster (Twitter/X)</div>
+      <div class="roadmap-item"><span class="check">✓</span> Solana SDK + Go CLI</div>
+      <div class="roadmap-item"><span class="check">✓</span> Rust Core SDK</div>
+      <div class="roadmap-item"><span class="check">✓</span> CI/CD + CodeQL</div>
+    </div>
+    <div class="roadmap-card">
+      <div class="roadmap-version">v1.1.0</div>
+      <div class="roadmap-title">Intelligence Layer</div>
+      <div class="roadmap-item"><span class="check">✓</span> Whale Tracker</div>
+      <div class="roadmap-item"><span class="check">✓</span> Chart photo analysis</div>
+      <div class="roadmap-item"><span class="check">✓</span> Signal history</div>
+      <div class="roadmap-item"><span class="check">✓</span> Alert Manager</div>
+      <div class="roadmap-item"><span class="check">✓</span> Live terminal dashboard</div>
+      <div class="roadmap-item"><span class="todo">○</span> Portfolio tracker</div>
+    </div>
+    <div class="roadmap-card">
+      <div class="roadmap-version">v2.0.0</div>
+      <div class="roadmap-title">Multi-chain</div>
+      <div class="roadmap-item"><span class="todo">○</span> Web dashboard (Next.js)</div>
+      <div class="roadmap-item"><span class="todo">○</span> EVM support (Base, Arb)</div>
+      <div class="roadmap-item"><span class="todo">○</span> Agent coordination layer</div>
+      <div class="roadmap-item"><span class="todo">○</span> Signal marketplace</div>
+      <div class="roadmap-item"><span class="todo">○</span> Mobile app</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-links">
+    <a href="https://github.com/nujar00t/Orin.LAB" target="_blank">GitHub</a>
+    <a href="https://github.com/nujar00t/Orin.LAB/issues" target="_blank">Issues</a>
+    <a href="https://github.com/nujar00t/Orin.LAB/blob/main/CONTRIBUTING.md" target="_blank">Contributing</a>
+    <a href="https://github.com/nujar00t/Orin.LAB/blob/main/LICENSE" target="_blank">MIT License</a>
+  </div>
+  <p>Orin.LAB · AI Research Lab for Crypto Markets · Built on Solana · Powered by Claude AI</p>
+  <p style="margin-top:0.5rem; color: #484f58; font-size:0.75rem;">
+    ⚠️ Not financial advice. Always DYOR.
+  </p>
+</footer>
+
+</body>
+</html>
