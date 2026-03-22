@@ -5,12 +5,12 @@ Generate BUY/SELL/HOLD signals from on-chain data + sentiment analysis.
 
 import os
 import httpx
-import anthropic
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 from rich.prompt import Prompt
 from rich import box
+from utils.ai_client import chat
 
 console = Console()
 
@@ -50,17 +50,11 @@ def fetch_price(mint: str) -> float:
 def generate_signal(symbol: str, price: float) -> str:
     if price == 0:
         return "Unable to fetch price data."
-    client = anthropic.Anthropic()
-    response = client.messages.create(
-        model="claude-haiku-4-5-20251001",
-        max_tokens=200,
+    return chat(
+        messages=[{"role": "user", "content": f"Generate signal for {symbol} at current price ${price:.4f}"}],
         system=SYSTEM_PROMPT,
-        messages=[{
-            "role": "user",
-            "content": f"Generate signal for {symbol} at current price ${price:.4f}"
-        }]
+        max_tokens=200,
     )
-    return response.content[0].text
 
 
 def run():
