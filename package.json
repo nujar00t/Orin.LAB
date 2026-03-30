@@ -1,0 +1,15 @@
+{
+  "name": "orinlab",
+  "version": "1.0.0",
+  "description": "Orin.LAB — AI Research Lab for Crypto Markets",
+  "private": true,
+  "workspaces": ["sdk", "poster"],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}
