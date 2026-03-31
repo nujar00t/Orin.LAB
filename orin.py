@@ -76,5 +76,24 @@ def onchain():
     run()
 
 
+@cli.command()
+@click.argument("tokens", nargs=-1)
+def posts(tokens):
+    """Preview natural human-style posts for given tokens (default: SOL BTC ETH)"""
+    from agents.technical_analysis import analyze
+    from agents.post_writer import preview_all
+
+    symbols = list(tokens) if tokens else ["SOL", "BTC", "ETH"]
+    console.print(Panel.fit(
+        f"[bold cyan]Generating posts for {', '.join(f'${s}' for s in symbols)}...[/bold cyan]",
+        border_style="cyan"
+    ))
+    results = []
+    for sym in symbols:
+        with console.status(f"[dim]Analyzing ${sym}...[/dim]", spinner="dots"):
+            results.append(analyze(sym))
+    preview_all(results)
+
+
 if __name__ == "__main__":
     cli()

@@ -10,6 +10,7 @@ from utils.rate_limiter import anthropic_limiter
 from utils.ai_client import chat, chat_with_image
 from agents.signal_history import SignalHistory
 from agents.technical_analysis import analyze, format_report
+from agents.post_writer import build_signal_post, build_ta_thread
 
 logger = get_logger("bot.handlers")
 
@@ -144,6 +145,32 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         logger.error(f"Photo analysis error: {e}")
         await update.message.reply_text(f"⚠️ Could not analyze chart: {e}")
+
+
+async def handle_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Generate a ready-to-post Twitter/X post from TA."""
+    token = " ".join(context.args) if context.args else "SOL"
+    token = token.upper().replace("$", "")
+    msg = update.message or update.callback_query.message
+    await msg.reply_text(f"✍️ Writing post for `${token}`...", parse_mode="Markdown")
+    try:
+        import asyncio
+        result = await asyncio.get_event_loop().run_in_executor(None, analyze, token)
+        post = build_signal_post(result)
+        thread = build_ta_thread(result)
+
+        await msg.reply_text(
+            f"*Ready-to-post tweet:*\n\n```\n{post}\n```",
+            parse_mode="Markdown",
+        )
+        await msg.reply_text(
+            f"*Thread version (1/4):*\n\n```\n{thread[0]}\n```",
+            parse_mode="Markdown",
+        )
+        logger.info(f"Post generated: {token}")
+    except Exception as e:
+        logger.error(f"Post error: {e}")
+        await msg.reply_text(f"⚠️ Error: {e}")
 
 
 async def handle_ta(update: Update, context: ContextTypes.DEFAULT_TYPE):
