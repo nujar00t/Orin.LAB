@@ -27,13 +27,67 @@ Orin.LAB is an open-source, multi-language AI research lab for crypto markets �
 
 It connects **on-chain data**, **AI reasoning**, and **automated distribution** into a single, modular toolkit:
 
-- 🤖 **Telegram bot** that answers market questions and delivers signals in real time
-- 📊 **Signal engine** that generates BUY/SELL/HOLD signals from live on-chain data
-- 🐦 **Auto poster** that publishes alpha to Twitter/X automatically
+- 🤖 **Telegram bot** that answers market questions, analyzes chart photos, and delivers signals in real time
+- 📊 **Signal engine** with pure-Python TA (RSI, MACD, Bollinger Bands, EMA, ATR) — no external TA libraries
+- 🐋 **Whale tracker** that monitors large Solana wallets and fires instant alerts on big moves
+- 🐦 **Auto poster** that generates natural, human-style posts ready for Twitter/X
+- 📈 **Live dashboard** for real-time price and signal monitoring in the terminal
 - ⚡ **High-performance core** written in Rust for heavy computation
-- 🔧 **Lightweight CLI** in Go for terminal-native signal checks
 
 > *"Orin.LAB doesn't predict. It researches, signals, and acts."*
+
+---
+
+## Install
+
+```bash
+pip install orinlab
+```
+
+That's it. No cloning, no manual config files.
+
+---
+
+## Quickstart
+
+```bash
+# 1. Install
+pip install orinlab
+
+# 2. Setup — interactive wizard, takes ~1 minute
+orinlab setup
+
+# 3. Run
+orinlab bot        # Telegram AI bot
+orinlab signal     # Signal engine (terminal)
+orinlab posts SOL  # Generate posts for $SOL
+orinlab dashboard  # Live terminal dashboard
+```
+
+### What `orinlab setup` looks like
+
+```
+Step 1 — AI Provider
+  1 Anthropic (Claude)
+  2 DeepInfra (free tier)
+Choose provider: 2
+DeepInfra API key: ••••••••
+
+Step 2 — Telegram Bot
+Telegram bot token: ••••••••
+
+Step 3 — Solana (optional)
+Configure Solana wallet tracking? [y/N]
+
+Step 4 — Twitter/X Auto Poster (optional)
+Configure Twitter/X posting? [y/N]
+
+✓ Setup complete! Config saved to ~/.orinlab/.env
+  orinlab bot      — start Telegram bot
+  orinlab signal   — signal engine
+```
+
+Config is saved to `~/.orinlab/.env` — edit anytime to update keys.
 
 ---
 
@@ -51,7 +105,7 @@ It connects **on-chain data**, **AI reasoning**, and **automated distribution** 
 │         └─────────┬─────────┘                           │
 │                   ▼                                     │
 │          ┌────────────────┐                             │
-│          │   Claude AI    │  ← Anthropic API            │
+│          │   Claude AI    │  ← Anthropic / DeepInfra    │
 │          │  (Haiku/Sonnet)│                             │
 │          └────────┬───────┘                             │
 │                   │                                     │
@@ -64,7 +118,7 @@ It connects **on-chain data**, **AI reasoning**, and **automated distribution** 
 │         │                   │                           │
 │         ▼                   ▼                           │
 │    Twitter/X           Solana RPC                       │
-│                      (Jupiter API)                      │
+│                      (CoinGecko API)                    │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -74,217 +128,98 @@ It connects **on-chain data**, **AI reasoning**, and **automated distribution** 
 
 | Module | Language | Description |
 |--------|----------|-------------|
-| [**Telegram Bot**](bot/) | Python | AI-powered bot — market Q&A, signal delivery, inline keyboard |
+| [**Telegram Bot**](bot/) | Python | AI-powered bot — market Q&A, signal delivery, chart photo analysis |
 | [**Signal Engine**](agents/signal_engine.py) | Python | BUY/SELL/HOLD signals with confidence score and risk level |
+| [**Technical Analysis**](agents/technical_analysis.py) | Python | RSI, MACD, BB, EMA, ATR — pure Python, no TA libraries |
 | [**Market Analyst**](agents/market_analyst.py) | Python | Deep multi-factor market analysis using Claude Sonnet |
 | [**On-chain Agent**](agents/onchain_agent.py) | Python | Solana wallet monitoring, transaction parsing |
+| [**Whale Tracker**](agents/whale_tracker.py) | Python | Monitors large wallets, alerts on $50k+ moves |
 | [**Alert Manager**](agents/alert_manager.py) | Python | Async threshold-based alert dispatcher |
+| [**Post Writer**](agents/post_writer.py) | Python | Natural human-style post generator for Twitter/X |
+| [**Signal History**](agents/signal_history.py) | Python | Append-only JSON signal log with stats and filters |
 | [**Dashboard**](agents/dashboard.py) | Python | Live terminal dashboard with Rich layout |
-| [**Auto Poster**](poster/) | TypeScript | Automated signal posting to Twitter/X via Tweepy |
+| [**Auto Poster**](poster/) | TypeScript | Automated signal posting to Twitter/X |
 | [**Solana SDK**](sdk/) | TypeScript | On-chain data fetcher — prices, wallets, transactions |
 | [**Signal CLI**](cli/) | Go | Lightweight CLI for terminal-native signal checks |
 | [**Core SDK**](core/) | Rust | High-performance signal computation and data processing |
 
 ---
 
-## Quickstart
-
-### Prerequisites
-
-- Python 3.11+
-- Node.js 20+ & npm
-- Go 1.22+
-- Rust 1.76+ & Cargo
-
-### 1. Clone
-
-```bash
-git clone https://github.com/nujar00t/Orin.LAB.git
-cd Orin.LAB
-```
-
-### 2. Install all dependencies
-
-```bash
-make install
-```
-
-Or manually:
-
-```bash
-# Python
-pip install -r requirements.txt
-
-# TypeScript (Auto Poster + SDK)
-npm install
-cd poster && npm install
-cd sdk && npm install
-
-# Go CLI
-cd cli && go mod tidy
-
-# Rust Core
-cd core && cargo build --release
-```
-
-### 3. Configure environment
-
-```bash
-cp .env.example .env
-```
-
-Open `.env` and fill in your keys — minimum required:
-
-```env
-TELEGRAM_BOT_TOKEN=your_bot_token
-ANTHROPIC_API_KEY=your_anthropic_key
-```
-
-### 4. Run
-
-```bash
-# Interactive menu
-python orin.py
-
-# Or directly via make:
-make bot       # Telegram Bot
-make signal    # Signal Engine (terminal)
-make poster    # Auto Poster (Twitter/X)
-make cli       # Go Signal CLI
-```
-
----
-
-## Environment Variables
-
-| Variable | Required | Source | Description |
-|----------|----------|--------|-------------|
-| `TELEGRAM_BOT_TOKEN` | ✅ | [@BotFather](https://t.me/BotFather) | Telegram bot token |
-| `ANTHROPIC_API_KEY` | ✅ | [console.anthropic.com](https://console.anthropic.com) | Claude AI API key |
-| `SOLANA_RPC_URL` | ⬜ | [helius.dev](https://helius.dev) | Solana RPC endpoint (default: mainnet) |
-| `SOLANA_WALLET_ADDRESS` | ⬜ | Your wallet | Wallet to monitor with on-chain agent |
-| `TWITTER_API_KEY` | ⬜ | [developer.twitter.com](https://developer.twitter.com) | Twitter/X API key (for Auto Poster) |
-| `TWITTER_API_SECRET` | ⬜ | Twitter Dev Portal | Twitter API secret |
-| `TWITTER_ACCESS_TOKEN` | ⬜ | Twitter Dev Portal | OAuth access token |
-| `TWITTER_ACCESS_SECRET` | ⬜ | Twitter Dev Portal | OAuth access secret |
-| `SIGNAL_CONFIDENCE_THRESHOLD` | ⬜ | — | Min confidence to fire alerts (default: 70) |
-| `LOG_LEVEL` | ⬜ | — | `DEBUG` / `INFO` / `WARNING` (default: `INFO`) |
-
----
-
 ## Telegram Bot Commands
-
-Once the bot is running, these commands are available:
 
 | Command | Description |
 |---------|-------------|
 | `/start` | Welcome screen with quick-action keyboard |
-| `/signal $TOKEN` | Generate BUY/SELL/HOLD signal with confidence score |
-| `/analyze $TOKEN` | Deep AI market analysis (price action, levels, risks) |
+| `/signal $TOKEN` | BUY/SELL/HOLD signal with confidence score |
+| `/ta $TOKEN` | Full technical analysis — RSI, MACD, BB, EMA |
+| `/analyze $TOKEN` | Deep AI market analysis (Claude Sonnet) |
+| `/post $TOKEN` | Generate a ready-to-copy Twitter/X post |
+| `/history` | Last 10 signals generated |
 | `/help` | Show all commands |
 
-**Example:**
-```
-/signal $SOL
-→ 📊 Signal: $SOL
-   SIGNAL: BUY
-   Confidence: 82/100
-   Target: $185.00
-   Stop Loss: $152.00
-   Reasoning: SOL is holding key support at $158 with increasing DEX volume...
-   Risk Level: MEDIUM
-```
-
-Or just chat naturally — Orin maintains conversation history per user.
+**Send a chart photo** → instant AI chart analysis with signal, key levels, and pattern recognition.
 
 ---
 
-## Project Structure
+## AI Providers
 
-```
-Orin.LAB/
-├── orin.py                     ← Main entry point (Python)
-├── bot/
-│   ├── __init__.py
-│   ├── telegram_bot.py         ← Bot application setup
-│   └── handlers.py             ← Command & message handlers
-├── agents/
-│   ├── signal_engine.py        ← Signal generation (Jupiter + Claude)
-│   ├── signal_engine_v2.py     ← Rate-limited + cached version
-│   ├── market_analyst.py       ← Deep market analysis agent
-│   ├── onchain_agent.py        ← Solana on-chain monitoring
-│   ├── alert_manager.py        ← Threshold-based alert dispatcher
-│   └── dashboard.py            ← Live terminal dashboard
-├── utils/
-│   ├── config.py               ← Typed env-var config loader
-│   ├── logger.py               ← Centralized Rich logger
-│   ├── rate_limiter.py         ← Sliding-window rate limiter
-│   ├── cache.py                ← In-memory TTL cache
-│   └── helpers.py              ← Formatting and parsing utilities
-├── poster/
-│   └── src/index.ts            ← Auto poster to Twitter/X
-├── sdk/
-│   └── src/index.ts            ← Solana data SDK (TypeScript)
-├── cli/
-│   └── main.go                 ← Signal CLI (Go)
-├── core/
-│   └── src/lib.rs              ← High-performance core (Rust)
-├── tests/
-│   ├── test_signal_engine.py
-│   ├── test_onchain_agent.py
-│   ├── test_helpers.py
-│   ├── test_rate_limiter.py
-│   ├── test_cache.py
-│   └── test_config.py
-├── .github/
-│   ├── workflows/
-│   │   ├── ci.yml              ← Full CI pipeline
-│   │   ├── codeql.yml          ← Security scanning
-│   │   ├── test.yml            ← Test runner with coverage
-│   │   ├── lint.yml            ← Ruff + TypeScript linting
-│   │   └── release.yml         ← Auto GitHub releases
-│   ├── ISSUE_TEMPLATE/
-│   ├── PULL_REQUEST_TEMPLATE.md
-│   ├── CODEOWNERS
-│   ├── FUNDING.yml
-│   └── dependabot.yml
-├── Makefile
-├── requirements.txt
-├── pyproject.toml
-├── package.json
-├── tsconfig.json
-├── .editorconfig
-└── .env.example
+Orin.LAB supports multiple AI backends — switch with one env var:
+
+| Provider | Setup | Notes |
+|----------|-------|-------|
+| **Anthropic** | `ANTHROPIC_API_KEY` | Best quality, Claude Haiku/Sonnet |
+| **DeepInfra** | `DEEPINFRA_API_KEY` | Free tier available, Llama 3.1 70B |
+| **OpenAI** | `OPENAI_API_KEY` | Any OpenAI-compatible endpoint |
+| **OpenRouter** | `OPENAI_API_KEY` + `OPENAI_BASE_URL` | Access to 100+ models |
+
+```env
+# Switch provider in ~/.orinlab/.env
+AI_PROVIDER=deepinfra
+DEEPINFRA_API_KEY=your_key
+DEEPINFRA_MODEL=meta-llama/Meta-Llama-3.1-70B-Instruct
 ```
 
 ---
 
-## Development
+## For Developers
+
+Clone and run locally:
+
+```bash
+git clone https://github.com/nujar00t/Orin.LAB.git
+cd Orin.LAB
+pip install -r requirements.txt
+cp .env.example .env   # fill in your keys
+py orin.py signal
+```
 
 ### Run tests
 
 ```bash
-# All Python tests
-make test
-
+pytest tests/ -v
 # With coverage
-pytest tests/ -v --cov=utils --cov=agents --cov=bot --cov-report=term-missing
-
-# Individual test files
-pytest tests/test_signal_engine.py -v
+pytest tests/ --cov=utils --cov=agents --cov-report=term-missing
 ```
 
-### Lint
+### Project Structure
 
-```bash
-make lint
-
-# Python only
-ruff check .
-ruff format --check .
-
-# TypeScript only
-npx tsc --noEmit
+```
+Orin.LAB/
+├── orinlab/            ← installable package entry point
+│   ├── cli.py          ← orinlab command
+│   └── __main__.py
+├── cli_setup.py        ← interactive setup wizard
+├── orin.py             ← dev entry point
+├── bot/                ← Telegram bot
+├── agents/             ← all AI agents and tools
+├── utils/              ← shared utilities (cache, rate limiter, logger, config)
+├── poster/             ← TypeScript auto poster
+├── sdk/                ← TypeScript Solana SDK
+├── cli/                ← Go signal CLI
+├── core/               ← Rust core SDK
+├── tests/              ← Python unit tests (35+ tests)
+├── docs/               ← GitHub Pages landing page
+└── .github/            ← CI/CD, CodeQL, issue templates
 ```
 
 ### Branches
@@ -292,10 +227,9 @@ npx tsc --noEmit
 | Branch | Purpose |
 |--------|---------|
 | `main` | Stable, production-ready |
-| `develop` | Integration branch for features |
+| `develop` | Integration branch |
 | `feature/*` | New features |
-| `hotfix/*` | Urgent production fixes |
-| `chore/*` | Config, docs, tooling |
+| `hotfix/*` | Urgent fixes |
 
 ---
 
@@ -304,28 +238,27 @@ npx tsc --noEmit
 ### v1.0.0 — Foundation ✅
 - [x] Telegram AI Bot with conversation history
 - [x] Signal Engine with on-chain data + AI
-- [x] Market Analyst (Claude Sonnet)
-- [x] On-chain Agent (Solana wallet monitoring)
 - [x] Auto Poster (Twitter/X)
-- [x] TypeScript Solana SDK
-- [x] Go Signal CLI
-- [x] Rust Core SDK
-- [x] Full CI/CD pipeline + CodeQL + Dependabot
+- [x] TypeScript Solana SDK, Go CLI, Rust Core
+- [x] Full CI/CD + CodeQL + Dependabot
 
-### v1.1.0 — Intelligence Layer
-- [ ] Alert Manager — auto-notify on high-confidence signals
-- [ ] Live terminal dashboard
-- [ ] Whale wallet tracker
-- [ ] Chart image analysis via Telegram photo
-- [ ] Rate limiter + TTL cache for all API calls
+### v1.1.0 — Intelligence Layer ✅
+- [x] Pure-Python TA engine (RSI, MACD, BB, EMA, ATR)
+- [x] Whale Tracker — real-time large wallet monitoring
+- [x] Chart photo analysis via Telegram
+- [x] Signal history log
+- [x] Alert Manager
+- [x] Post Writer — natural human-style posts
+- [x] `pip install orinlab` — one-line install
 
 ### v1.2.0 — Distribution
+- [ ] Publish to PyPI (pip install orinlab globally)
 - [ ] Web dashboard (Next.js)
-- [ ] Signal history & analytics
-- [ ] Webhook support for third-party integrations
+- [ ] Signal history analytics
+- [ ] Webhook support
 
 ### v2.0.0 — Multi-chain
-- [ ] EVM chain support (Ethereum, Base, Arbitrum)
+- [ ] EVM support (Base, Arbitrum, Ethereum)
 - [ ] Agent coordination layer
 - [ ] Mobile app
 
@@ -333,18 +266,18 @@ npx tsc --noEmit
 
 ## Contributing
 
-Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) first.
+Contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) first.
 
 1. Fork the repo
-2. Create a feature branch: `git checkout -b feature/your-feature`
-3. Commit your changes following [Conventional Commits](https://www.conventionalcommits.org/)
-4. Open a pull request against `develop`
+2. Create a branch: `git checkout -b feature/your-feature`
+3. Follow [Conventional Commits](https://www.conventionalcommits.org/)
+4. Open a PR against `develop`
 
 ---
 
 ## Security
 
-Found a vulnerability? See [SECURITY.md](SECURITY.md) for responsible disclosure guidelines. Do **not** open a public issue.
+Found a vulnerability? See [SECURITY.md](SECURITY.md). Do **not** open a public issue.
 
 ---
 
@@ -353,9 +286,8 @@ Found a vulnerability? See [SECURITY.md](SECURITY.md) for responsible disclosure
 Orin.LAB is experimental software for research purposes.
 
 - AI signals are **not financial advice**
-- Past signal accuracy does **not** guarantee future results
-- Always do your own research (DYOR)
-- Never share your private key or seed phrase
+- Always DYOR
+- Never share your private key
 - Use at your own risk
 
 ---
@@ -370,7 +302,7 @@ MIT — see [LICENSE](LICENSE)
 
 **Orin.LAB** · AI Research Lab for Crypto Markets
 
-Built with ❤️ on [Solana](https://solana.com) · Powered by [Claude AI](https://anthropic.com)
+Built on [Solana](https://solana.com) · Powered by [Claude AI](https://anthropic.com)
 
 `$ORNL` · [GitHub](https://github.com/nujar00t/Orin.LAB) · [Issues](https://github.com/nujar00t/Orin.LAB/issues)
 
