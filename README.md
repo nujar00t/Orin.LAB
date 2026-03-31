@@ -13,6 +13,7 @@
 [![Rust](https://img.shields.io/badge/Rust-1.76+-CE422B?style=flat-square&logo=rust&logoColor=white)](https://rust-lang.org)
 [![Go](https://img.shields.io/badge/Go-1.22+-00ADD8?style=flat-square&logo=go&logoColor=white)](https://go.dev)
 [![Solana](https://img.shields.io/badge/Solana-Mainnet-9945FF?style=flat-square&logo=solana&logoColor=white)](https://solana.com)
+[![Token](https://img.shields.io/badge/%24ORNL-6Nfn8vpwEmGSyjYgHMctt9hrsB6TBa5TT1WjonRpump-orange?style=flat-square)](https://pump.fun/coin/6Nfn8vpwEmGSyjYgHMctt9hrsB6TBa5TT1WjonRpump)
 [![License](https://img.shields.io/badge/License-MIT-22c55e?style=flat-square)](LICENSE)
 [![CI](https://github.com/nujar00t/Orin.LAB/actions/workflows/ci.yml/badge.svg)](https://github.com/nujar00t/Orin.LAB/actions)
 [![CodeQL](https://github.com/nujar00t/Orin.LAB/actions/workflows/codeql.yml/badge.svg)](https://github.com/nujar00t/Orin.LAB/actions)
@@ -304,6 +305,6 @@ MIT — see [LICENSE](LICENSE)
 
 Built on [Solana](https://solana.com) · Powered by [Claude AI](https://anthropic.com)
 
-`$ORNL` · [GitHub](https://github.com/nujar00t/Orin.LAB) · [Issues](https://github.com/nujar00t/Orin.LAB/issues)
+[`$ORNL`](https://pump.fun/coin/6Nfn8vpwEmGSyjYgHMctt9hrsB6TBa5TT1WjonRpump) · CA: `6Nfn8vpwEmGSyjYgHMctt9hrsB6TBa5TT1WjonRpump` · [GitHub](https://github.com/nujar00t/Orin.LAB) · [Issues](https://github.com/nujar00t/Orin.LAB/issues)
 
 </div>
